@@ -10,18 +10,24 @@ use std::sync::Arc;
 use std::time::Duration;
 
 pub fn create_window(rx: Receiver<i32>, pause: Arc<AtomicBool>) {
+    // Manage everything that can happen within the program
     let sdl_context = sdl2::init().unwrap();
+    // Group everything video-related
     let video_subsystem = sdl_context.video().unwrap();
+    // Initialise font API
     let ttf_context = sdl2::ttf::init().unwrap();
+    // Load font
     let font = ttf_context
         .load_font("/usr/share/fonts/truetype/noto/NotoSans-Regular.ttf", 32)
         .unwrap();
+    // Spawn the main window
     let window = video_subsystem
         .window("RetroEmu", 800, 600)
         .position_centered()
         .build()
         .unwrap();
 
+    // Manage and own a target (surface or window) and allow drawing in it
     let mut canvas = window.into_canvas().build().unwrap();
     let texture_creator = canvas.texture_creator();
     let mut event_pump = sdl_context.event_pump().unwrap();
@@ -56,7 +62,7 @@ pub fn create_window(rx: Receiver<i32>, pause: Arc<AtomicBool>) {
         canvas.clear();
         // draw the text
         let label = if pause.load(Ordering::Relaxed) {
-            format!("count: {count} paused")
+            format!("count: {count} (paused)")
         } else {
             format!("count: {count}")
         };
