@@ -33,7 +33,9 @@ pub fn create_window(rx: Receiver<i32>, pause: Arc<AtomicBool>) {
     let mut event_pump = sdl_context.event_pump().unwrap();
 
     let mut count = 0;
+    // Game loop
     'running: loop {
+        // Events when buttons pressed
         for event in event_pump.poll_iter() {
             match event {
                 Event::Quit { .. }
@@ -41,6 +43,7 @@ pub fn create_window(rx: Receiver<i32>, pause: Arc<AtomicBool>) {
                     keycode: Some(Keycode::Escape),
                     ..
                 } => {
+                    // Break loop if game paused
                     pause.store(false, Ordering::Relaxed);
                     break 'running;
                 }
@@ -49,15 +52,18 @@ pub fn create_window(rx: Receiver<i32>, pause: Arc<AtomicBool>) {
                     repeat: false,
                     ..
                 } => {
-                    pause.fetch_xor(true, Ordering::Relaxed); // toggle
+                    // undo pause if quitting when game paused
+                    pause.fetch_xor(true, Ordering::Relaxed);
                 }
                 _ => {}
             }
         }
+        // receive values from main thread
         while let Ok(val) = rx.try_recv() {
             count = val;
         }
 
+        // Window full black
         canvas.set_draw_color(Color::RGB(0, 0, 0));
         canvas.clear();
         // draw the text
@@ -66,11 +72,12 @@ pub fn create_window(rx: Receiver<i32>, pause: Arc<AtomicBool>) {
         } else {
             format!("count: {count}")
         };
+        // define font color
         let surface = font
             .render(&label)
             .blended(Color::RGB(255, 255, 255))
             .unwrap();
-
+        // create texture
         let texture = texture_creator
             .create_texture_from_surface(&surface)
             .unwrap();
