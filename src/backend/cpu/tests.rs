@@ -1,5 +1,5 @@
-use crate::bus::Bus;
-use crate::cpu::*;
+use super::bus::Bus;
+use super::*;
 
 struct TestBus(Vec<u8>);
 
