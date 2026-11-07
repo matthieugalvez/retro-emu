@@ -1,19 +1,19 @@
 mod cartridge;
 mod display;
 mod registers;
+use std::error::Error;
 use std::fs::File;
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::{mpsc, Arc};
+use std::sync::{Arc, mpsc};
 use std::thread;
 use std::time::Duration;
-use std::error::Error;
 
 fn main() -> Result<(), Box<dyn Error>> {
     let args = std::env::args().skip(1).collect::<Box<[_]>>();
 
     // Check args
-    if args.len() < 1 || args.len() > 2 {
-        return Err("wrong number of args".into())
+    if args.is_empty() || args.len() > 2 {
+        return Err("wrong number of args".into());
     }
     let rom_path = File::open(&args[0])?;
     println!("{:?}", rom_path);
