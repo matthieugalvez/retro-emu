@@ -1,4 +1,6 @@
-use crate::bus::{Bus, BusExt};
+mod bus;
+mod registers;
+use bus::{Bus, BusExt};
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub struct CpuFlags {
@@ -1780,5 +1782,4 @@ impl std::fmt::Display for Instruction {
 }
 
 #[cfg(test)]
-#[path = "cpu_test.rs"]
 mod tests;

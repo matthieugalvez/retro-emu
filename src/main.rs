@@ -1,6 +1,5 @@
-mod cartridge;
+mod backend;
 mod display;
-mod registers;
 use std::error::Error;
 use std::fs::File;
 use std::sync::atomic::{AtomicBool, Ordering};
