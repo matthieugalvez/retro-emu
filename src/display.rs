@@ -2,10 +2,13 @@ use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
 use sdl2::rect::Rect;
+use sdl2::rwops::RWops;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::mpsc::Receiver;
 use std::time::Duration;
+
+const FONT: &[u8] = include_bytes!("/usr/share/fonts/truetype/noto/NotoSans-Regular.ttf");
 
 pub fn create_window(rx: Receiver<i32>, pause: Arc<AtomicBool>) {
     // Manage everything that can happen within the program
@@ -15,9 +18,8 @@ pub fn create_window(rx: Receiver<i32>, pause: Arc<AtomicBool>) {
     // Initialise font API
     let ttf_context = sdl2::ttf::init().unwrap();
     // Load font
-    let font = ttf_context
-        .load_font("/usr/share/fonts/truetype/noto/NotoSans-Regular.ttf", 32)
-        .unwrap();
+    let rwops = RWops::from_bytes(FONT);
+    let mut font = ttf_context.load_font_from_rwops(rwops.expect("REASON"), 32);
     // Spawn the main window
     let window = video_subsystem
         .window("RetroEmu", 800, 600)
@@ -71,7 +73,7 @@ pub fn create_window(rx: Receiver<i32>, pause: Arc<AtomicBool>) {
             format!("count: {count}")
         };
         // define font color
-        let surface = font
+        let surface = font.as_mut().expect("REASON")
             .render(&label)
             .blended(Color::RGB(255, 255, 255))
             .unwrap();
