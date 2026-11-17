@@ -1,6 +1,8 @@
 mod apu;
 mod cpu;
+pub mod emulator;
 mod input;
-mod mbc;
+pub mod mbc;
+mod mmu;
 mod ppu;
 mod timer;
