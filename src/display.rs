@@ -8,7 +8,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::mpsc::Receiver;
 use std::time::Duration;
 
-const FONT: &[u8] = include_bytes!("/usr/share/fonts/truetype/noto/NotoSans-Regular.ttf");
+const FONT: &[u8] = include_bytes!("../assets/AdwaitaMono-Bold.ttf");
 
 pub fn create_window(rx: Receiver<i32>, pause: Arc<AtomicBool>) {
     // Manage everything that can happen within the program
@@ -73,7 +73,9 @@ pub fn create_window(rx: Receiver<i32>, pause: Arc<AtomicBool>) {
             format!("count: {count}")
         };
         // define font color
-        let surface = font.as_mut().expect("REASON")
+        let surface = font
+            .as_mut()
+            .expect("REASON")
             .render(&label)
             .blended(Color::RGB(255, 255, 255))
             .unwrap();
