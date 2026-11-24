@@ -4,7 +4,7 @@ use sdl2::keyboard::Keycode;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 
-pub fn event_loop(event_pump: &mut EventPump, pause: &Arc<AtomicBool>) -> bool {
+pub fn event_loop(event_pump: &mut EventPump, pause: Arc<AtomicBool>) -> bool {
     // Events when buttons pressed
     for event in event_pump.poll_iter() {
         match event {

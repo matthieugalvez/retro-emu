@@ -1,11 +1,10 @@
-use sdl2::pixels::Color;
-use sdl2::rect::Rect;
 use std::sync::Arc;
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::atomic::AtomicBool;
 use std::sync::mpsc::Receiver;
 use std::time::Duration;
 mod events;
 mod font;
+mod render;
 
 pub fn create_window(rx: Receiver<i32>, pause: Arc<AtomicBool>) {
     // Manage everything that can happen within the program
@@ -15,7 +14,7 @@ pub fn create_window(rx: Receiver<i32>, pause: Arc<AtomicBool>) {
     // Initialise font API
     let ttf_context = sdl2::ttf::init().unwrap();
     // Load font
-    let mut font = font::load_font(&ttf_context, 32);
+    let font = font::load_font(&ttf_context, 32).expect("failed to load font");
     // Spawn the main window
     let window = video_subsystem
         .window("RetroEmu", 800, 600)
@@ -32,39 +31,14 @@ pub fn create_window(rx: Receiver<i32>, pause: Arc<AtomicBool>) {
     // Game loop
     'running: loop {
         // Events when buttons pressed
-        if !events::event_loop(&mut event_pump, &pause) {
+        if !events::event_loop(&mut event_pump, pause.clone()) {
             break 'running;
         }
         // receive values from main thread
         while let Ok(val) = rx.try_recv() {
             count = val;
         }
-        // Window full black
-        canvas.set_draw_color(Color::RGB(0, 0, 0));
-        canvas.clear();
-        // draw the text
-        let label = if pause.load(Ordering::Relaxed) {
-            format!("count: {count} (paused)")
-        } else {
-            format!("count: {count}")
-        };
-        // define font color
-        let surface = font
-            .as_mut()
-            .expect("REASON")
-            .render(&label)
-            .blended(Color::RGB(255, 255, 255))
-            .unwrap();
-        // create texture
-        let texture = texture_creator
-            .create_texture_from_surface(&surface)
-            .unwrap();
-
-        let q = texture.query();
-        canvas
-            .copy(&texture, None, Rect::new(20, 20, q.width, q.height))
-            .unwrap();
-        canvas.present();
+        render::render_window(count, pause.clone(), &mut canvas, &texture_creator, &font);
         ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 60));
     }
 }
