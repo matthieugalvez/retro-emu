@@ -562,14 +562,14 @@ impl Cpu {
     where
         B: Bus,
     {
-        // XXX move to executor
-
         let ime_pending = self.ime_pending;
 
         self.handle_instruction_inner(bus, instruction);
 
         if ime_pending {
-            // XXX wrong if halted
+            if self.halted {
+                todo!("handle interrupt while halted");
+            }
 
             self.ime = true;
             self.ime_pending = false;
