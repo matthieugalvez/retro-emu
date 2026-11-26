@@ -32,6 +32,7 @@ pub struct Cpu {
     pub sp: u16,
     pub ime: bool,
     pub ime_pending: bool,
+    pub halted: bool,
 }
 
 impl Cpu {
